@@ -11,19 +11,34 @@ const Drawer = ({ closeDrawer }) => {
   const [isExiting, setIsExiting] = useState(false)
   const itemSidebarAdmin = [
     {
-      name: "Home",
+      name: "Dashboard",
       icon: GoHomeFill,
       path: '/'
     },
     {
       name: "Surat Masuk",
-      icon: FaUserTie,
+      icon: FaFileImport,
       path: '/surat-masuk-page'
     },
     {
       name: "Surat Keluar",
-      icon: AiOutlineBulb,
+      icon: FaFileExport,
       path: '/surat-keluar-page'
+    },
+    {
+      name: "Jenis Surat",
+      icon: FaFileAlt,
+      path: '/jenis-surat-page'
+    },
+    {
+      name: "Jabatan",
+      icon: MdBadge,
+      path: '/jabatan-page'
+    },
+    {
+      name: "Pegawai",
+      icon: FaUserTie,
+      path: '/pegawai-page'
     },
   ]
 
