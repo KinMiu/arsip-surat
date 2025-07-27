@@ -1,9 +1,10 @@
 import { Link, useLocation } from 'react-router-dom'
 import { GoHomeFill } from 'react-icons/go'
-import { FaUserTie } from "react-icons/fa6"
-import { AiOutlineBulb } from "react-icons/ai";
+import { FaFileExport, FaFileImport, FaUserTie } from "react-icons/fa6"
 import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { MdBadge } from 'react-icons/md';
+import { FaFileAlt } from 'react-icons/fa';
 
 const Drawer = ({ closeDrawer }) => {
   const [role, setToken] = useState('')
