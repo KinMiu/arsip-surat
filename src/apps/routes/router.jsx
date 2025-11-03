@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { page } from '../pages'
-import { RequireAuth } from "./utils/requireAuth";
+import { RequireAuth, RequireRole } from "./utils/requireAuth";
 
 const router = createBrowserRouter([
   {
@@ -16,7 +16,21 @@ const router = createBrowserRouter([
     element: <RequireAuth/>,
     children: [
       {
-        path: '/',
+        path: '/dashboard/pegawai',
+        element: page.DashboardKaryawan
+      },
+      {
+        path: '/surat-masuk-pegawai-page',
+        element: page.SuratMasukPegawaiPage
+      }
+    ]
+  },
+  {
+    path: '/',
+    element: <RequireRole allowedRoles={['1']} redirectPath="/" />,
+    children: [
+      {
+        path: '/dashboard',
         element: page.homepage
       },
       {
@@ -80,7 +94,7 @@ const router = createBrowserRouter([
         element: page.FormEditPegawaiPage
       },
     ]
-  },
+  }
 ])
 
 export default router

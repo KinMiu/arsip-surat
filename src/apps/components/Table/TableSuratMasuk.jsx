@@ -5,17 +5,16 @@ import FormDisposisi from "../Form/FormDisposisi";
 import { useNavigate } from "react-router-dom";
 
 const TableSuratMasuk = ({ dataSurat, dataPegawai }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [selectedSurat, setSelectedSurat] = useState(null);
-  console.log(dataSurat) 
+  const [previewFile, setPreviewFile] = useState(null);
 
   const handleNavigate = (idSurat) => {
-    return navigate(`/surat-masuk-page/edit-surat/${idSurat}`)
-  }
+    navigate(`/surat-masuk-page/edit-surat/${idSurat}`);
+  };
 
   const handleDelete = async (id) => {
     try {
-      // console.log(id)
       const response = await ServiceSurat.deleteSuratMasuk(id);
       SweetAlertService.showSuccess("Success", response.message);
       window.location.reload();
@@ -24,19 +23,17 @@ const TableSuratMasuk = ({ dataSurat, dataPegawai }) => {
     }
   };
 
-  const downloadFile = async (url) => {
+  const handleDownload = async (url) => {
     try {
       const filename = getFileNameFromUrl(url);
       const response = await fetch(url);
       const blob = await response.blob();
 
       const blobUrl = window.URL.createObjectURL(blob);
-
       const link = document.createElement("a");
       link.href = blobUrl;
       link.download = filename;
       link.click();
-
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
       alert("Gagal mengunduh file.");
@@ -46,15 +43,12 @@ const TableSuratMasuk = ({ dataSurat, dataPegawai }) => {
 
   function getFileNameFromUrl(url) {
     try {
-      const decodedUrl = decodeURIComponent(url); // decode agar %20 jadi spasi
+      const decodedUrl = decodeURIComponent(url);
       const parts = decodedUrl.split("/");
-      let fileName = parts[parts.length - 1]; // ambil bagian terakhir
-
-      // Jika tidak ada ekstensi, tambahkan .pdf
+      let fileName = parts[parts.length - 1];
       if (!fileName.includes(".")) {
         fileName += ".pdf";
       }
-
       return fileName;
     } catch {
       return "file.pdf";
@@ -105,13 +99,10 @@ const TableSuratMasuk = ({ dataSurat, dataPegawai }) => {
                 <td className="px-4 py-2 border-r">{data.PERIHAL}</td>
                 <td className="px-4 py-2 border-r">
                   <button
-                    onClick={() => downloadFile(data.FILE_PATH)}
-                    // href={`/download?url=${encodeURIComponent(data.FILE_PATH)}`}
-                    // target="_blank"
-                    rel="noopener noreferrer"
+                    onClick={() => setPreviewFile(data.FILE_PATH)}
                     className="text-blue-500 underline"
                   >
-                    Unduh File
+                    Lihat Surat
                   </button>
                 </td>
                 <td className="px-4 py-2 border-r">{data.KETERANGAN}</td>
@@ -141,6 +132,7 @@ const TableSuratMasuk = ({ dataSurat, dataPegawai }) => {
         </tbody>
       </table>
 
+      {/* Modal Disposisi */}
       {selectedSurat && (
         <FormDisposisi
           suratId={selectedSurat.IDSURATMASUK}
@@ -148,6 +140,52 @@ const TableSuratMasuk = ({ dataSurat, dataPegawai }) => {
           dataDisposisi={selectedSurat.DISPOSISI || []}
           onClose={() => setSelectedSurat(null)}
         />
+      )}
+
+      {/* Modal Preview Surat */}
+      {previewFile && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded shadow-lg w-11/12 md:w-3/4 h-[90vh] flex flex-col">
+            {/* Header */}
+            <div className="flex justify-between items-center border-b px-4 py-2">
+              <h2 className="text-lg font-semibold">Preview Surat</h2>
+              <button
+                onClick={() => setPreviewFile(null)}
+                className="text-gray-500 hover:text-red-500 text-xl"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-auto p-2">
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                  previewFile
+                )}&embedded=true`}
+                className="w-full h-full"
+                frameBorder="0"
+                title="PDF Preview"
+              ></iframe>
+            </div>
+
+            {/* Footer */}
+            <div className="border-t px-4 py-2 flex justify-end gap-2">
+              <button
+                onClick={() => handleDownload(previewFile)}
+                className="bg-green-500 text-white px-4 py-1 rounded"
+              >
+                Download
+              </button>
+              <button
+                onClick={() => setPreviewFile(null)}
+                className="bg-gray-500 text-white px-4 py-1 rounded"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

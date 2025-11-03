@@ -10,6 +10,7 @@ const DashboardKaryawan = () => {
   const [dataSuratMasuk, setDataSuratMasuk] = useState([]);
   const [selectedSurat, setSelectedSurat] = useState(null);
   const [dataJenisSurat, setDataJenisSurat] = useState([]);
+  const [previewFile, setPreviewFile] = useState(null);
 
   const [searchPerihal, setSearchPerihal] = useState("");
   const [filterJenisSurat, setFilterJenisSurat] = useState("");
@@ -52,7 +53,7 @@ const DashboardKaryawan = () => {
         const updatedSurat = {
           ...surat,
           DISPOSISI: surat.DISPOSISI.map((d) =>
-            d.PEGAWAI?.IDPEGAI === idPegawai ? { ...d, SUDAH_DILIHAT: true } : d
+            d.PEGAWAI?.IDPEGAWAI === idPegawai ? { ...d, SUDAH_DILIHAT: true } : d
           ),
         };
 
@@ -85,6 +86,46 @@ const DashboardKaryawan = () => {
       (d) => d.PEGAWAI?.IDPEGAWAI === idPegawai && !d.SUDAH_DILIHAT
     )
   );
+
+  const handleDownload = async (url) => {
+    try {
+      const filename = getFileNameFromUrl(url);
+      const response = await fetch(url);
+      const blob = await response.blob();
+
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      link.click();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      alert("Gagal mengunduh file.");
+      console.error(error);
+    }
+  };
+
+  function getFileNameFromUrl(url) {
+    try {
+      const decodedUrl = decodeURIComponent(url);
+      const parts = decodedUrl.split("/");
+      let fileName = parts[parts.length - 1];
+      if (!fileName.includes(".")) {
+        fileName += ".pdf";
+      }
+      return fileName;
+    } catch {
+      return "file.pdf";
+    }
+  }
+
+  const handleLihatSurat = (surat) => {
+  // Panggil logika update status
+  handleOpenSurat(surat);
+
+  // Set file untuk preview
+  setPreviewFile(surat.FILE_PATH);
+};
 
   useEffect(() => {
     getSuratMasuk();
@@ -190,6 +231,7 @@ const DashboardKaryawan = () => {
               <th className="border px-3 py-2">Perihal</th>
               <th className="border px-3 py-2">Pengirim</th>
               <th className="border px-3 py-2">Tanggal Surat</th>
+              <th className="border px-3 py-2">Surat</th>
               <th className="border px-3 py-2">Status</th>
               <th className="border px-3 py-2">Action</th>
             </tr>
@@ -213,6 +255,14 @@ const DashboardKaryawan = () => {
                     <td className="border px-3 py-2">{surat.PENGIRIM}</td>
                     <td className="border px-3 py-2">
                       {new Date(surat.TANGGAL_SURAT).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-2 border-r">
+                      <button
+                        onClick={() => handleLihatSurat(surat)}
+                        className="text-blue-500 underline"
+                      >
+                        Lihat Surat
+                      </button>
                     </td>
                     <td className="border px-3 py-2 text-center">
                       {disp?.SUDAH_DILIHAT ? "✅ Dibaca" : "❌ Belum Dibaca"}
@@ -239,6 +289,52 @@ const DashboardKaryawan = () => {
         onClose={() => setSelectedSurat(null)}
         idPegawai={idPegawai}
       />
+
+      {/* Modal Preview Surat */}
+      {previewFile && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded shadow-lg w-11/12 md:w-3/4 h-[90vh] flex flex-col">
+            {/* Header */}
+            <div className="flex justify-between items-center border-b px-4 py-2">
+              <h2 className="text-lg font-semibold">Preview Surat</h2>
+              <button
+                onClick={() => setPreviewFile(null)}
+                className="text-gray-500 hover:text-red-500 text-xl"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-auto p-2">
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                  previewFile
+                )}&embedded=true`}
+                className="w-full h-full"
+                frameBorder="0"
+                title="PDF Preview"
+              ></iframe>
+            </div>
+
+            {/* Footer */}
+            <div className="border-t px-4 py-2 flex justify-end gap-2">
+              <button
+                onClick={() => handleDownload(previewFile)}
+                className="bg-green-500 text-white px-4 py-1 rounded"
+              >
+                Download
+              </button>
+              <button
+                onClick={() => setPreviewFile(null)}
+                className="bg-gray-500 text-white px-4 py-1 rounded"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };

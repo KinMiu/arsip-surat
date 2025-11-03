@@ -32,10 +32,10 @@ const LoginForm = () => {
       // console.log(response)
 
       if(decode.ROLE === '2'){
-        navigate('/dashboard-user')
+        navigate('/dashboard/pegawai')
         return window.location.reload();
       }
-      navigate('/')
+      navigate('/dashboard')
       return window.location.reload();
     } catch (error) {
       SweetAlertService.showError('Error !!', error)

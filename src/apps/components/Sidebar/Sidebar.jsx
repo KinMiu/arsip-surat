@@ -17,7 +17,7 @@ const SidebarHomePage = () => {
     {
       name: "Dashboard",
       icon: GoHomeFill,
-      path: '/'
+      path: '/dashboard'
     },
     {
       name: "Surat Masuk",
@@ -49,7 +49,7 @@ const SidebarHomePage = () => {
     {
       name: "Dashboard",
       icon: GoHomeFill,
-      path: '/dashboard-user'
+      path: '/dashboard/pegawai'
     },
     {
       name: "Surat Masuk",

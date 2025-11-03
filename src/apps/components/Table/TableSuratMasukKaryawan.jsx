@@ -6,6 +6,7 @@ import DetailSuratModal from "../PopUp";
 
 const TableSuratMasukKaryawan = ({ dataSurat }) => {
   const [selectedSurat, setSelectedSurat] = useState(null); 
+  const [previewFile, setPreviewFile] = useState(null);
 
   const token = localStorage.getItem("access-token");
     const decoded = token ? jwtDecode(token) : null;
@@ -20,6 +21,38 @@ const TableSuratMasukKaryawan = ({ dataSurat }) => {
       SweetAlertService.showError("Error", error.message);
     }
   };
+
+  const handleDownload = async (url) => {
+    try {
+      const filename = getFileNameFromUrl(url);
+      const response = await fetch(url);
+      const blob = await response.blob();
+
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      link.click();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      alert("Gagal mengunduh file.");
+      console.error(error);
+    }
+  };
+
+  function getFileNameFromUrl(url) {
+    try {
+      const decodedUrl = decodeURIComponent(url);
+      const parts = decodedUrl.split("/");
+      let fileName = parts[parts.length - 1];
+      if (!fileName.includes(".")) {
+        fileName += ".pdf";
+      }
+      return fileName;
+    } catch {
+      return "file.pdf";
+    }
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -70,15 +103,12 @@ const TableSuratMasukKaryawan = ({ dataSurat }) => {
                 <td className="px-4 py-2 border-r">{data.PENGIRIM}</td>
                 <td className="px-4 py-2 border-r">{data.PERIHAL}</td>
                 <td className="px-4 py-2 border-r">
-                  <a
-                    href={`/download?url=${encodeURIComponent(data.FILE_PATH)}`}
-                    download
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => setPreviewFile(data.FILE_PATH)}
                     className="text-blue-500 underline"
                   >
-                    Unduh File
-                  </a>
+                    Lihat Surat
+                  </button>
                 </td>
                 <td className="px-4 py-2 border-r">{data.KETERANGAN}</td>
                 <td className="border px-3 py-2 text-center">
@@ -109,6 +139,52 @@ const TableSuratMasukKaryawan = ({ dataSurat }) => {
         onClose={() => setSelectedSurat(null)}
         idPegawai={idPegawai}
       />
+
+      {/* Modal Preview Surat */}
+      {previewFile && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded shadow-lg w-11/12 md:w-3/4 h-[90vh] flex flex-col">
+            {/* Header */}
+            <div className="flex justify-between items-center border-b px-4 py-2">
+              <h2 className="text-lg font-semibold">Preview Surat</h2>
+              <button
+                onClick={() => setPreviewFile(null)}
+                className="text-gray-500 hover:text-red-500 text-xl"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-auto p-2">
+              <iframe
+                src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                  previewFile
+                )}&embedded=true`}
+                className="w-full h-full"
+                frameBorder="0"
+                title="PDF Preview"
+              ></iframe>
+            </div>
+
+            {/* Footer */}
+            <div className="border-t px-4 py-2 flex justify-end gap-2">
+              <button
+                onClick={() => handleDownload(previewFile)}
+                className="bg-green-500 text-white px-4 py-1 rounded"
+              >
+                Download
+              </button>
+              <button
+                onClick={() => setPreviewFile(null)}
+                className="bg-gray-500 text-white px-4 py-1 rounded"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

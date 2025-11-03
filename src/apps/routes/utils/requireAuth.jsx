@@ -13,12 +13,13 @@ const RequireAuth = ( ) => {
 
 const RequireRole = ( {allowedRoles, redirectPath} ) => {
   const token = localStorage.getItem('access-token')
+  console.log(token)
 
   if (!token) {
     return <Navigate to={redirectPath} />
   }
-
   try {
+
     const { ROLE } = jwtDecode(token)
 
     if (!allowedRoles.includes(ROLE)) {

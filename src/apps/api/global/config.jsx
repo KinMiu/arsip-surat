@@ -2,8 +2,8 @@ import axios from "axios";
 
 // Membuat instance axios
 export const api = axios.create({
-  // baseURL: "http://localhost:3002/",
-  baseURL: "https://api-arsip-surat.psti-ubl.id/",
+  baseURL: "http://localhost:5018/",
+  // baseURL: "https://api-arsip-surat.psti-ubl.id/",
   withCredentials: true // Memastikan cookies dikirim dalam setiap request
 });
 

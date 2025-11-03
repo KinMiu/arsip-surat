@@ -14,7 +14,7 @@ const Drawer = ({ closeDrawer }) => {
     {
       name: "Dashboard",
       icon: GoHomeFill,
-      path: '/'
+      path: '/dashboard'
     },
     {
       name: "Surat Masuk",
@@ -40,6 +40,18 @@ const Drawer = ({ closeDrawer }) => {
       name: "Pegawai",
       icon: FaUserTie,
       path: '/pegawai-page'
+    },
+  ]
+  const itemSidebarKaryawan = [
+    {
+      name: "Dashboard",
+      icon: GoHomeFill,
+      path: '/dashboard/pegawai'
+    },
+    {
+      name: "Surat Masuk",
+      icon: FaFileImport,
+      path: '/surat-masuk-pegawai-page'
     },
   ]
 
@@ -74,7 +86,7 @@ const Drawer = ({ closeDrawer }) => {
               {
                 role === '2' 
                 ? 
-                itemSidebarAdmin.map((item, index) => (
+                itemSidebarKaryawan.map((item, index) => (
                   <li key={index} className="rounded ">
                     <Link 
                     to={item.path} 
