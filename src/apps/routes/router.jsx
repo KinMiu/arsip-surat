@@ -1,8 +1,6 @@
 import {createBrowserRouter, Navigate} from "react-router-dom";
 import {page} from "../pages";
-import RequireAuth from "./utils/RequireAuth";
-import RequireRole from "./utils/RequireRole";
-import RequireNoAuth from "./utils/RequireNoAuth";
+import {RequireAuth, RequireNoAuth, RequireRole} from "./utils/requireAuth";
 
 const router = createBrowserRouter([
   /* ================= PUBLIC ================= */
