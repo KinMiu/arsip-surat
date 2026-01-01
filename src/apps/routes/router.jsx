@@ -1,100 +1,110 @@
-import { createBrowserRouter } from "react-router-dom";
-import { page } from '../pages'
-import { RequireAuth, RequireRole } from "./utils/requireAuth";
+import {createBrowserRouter, Navigate} from "react-router-dom";
+import {page} from "../pages";
+import RequireAuth from "./utils/RequireAuth";
+import RequireRole from "./utils/RequireRole";
+import RequireNoAuth from "./utils/RequireNoAuth";
 
 const router = createBrowserRouter([
+  /* ================= PUBLIC ================= */
   {
-    path: '/login',
-    element: page.loginpage
-  },
-  {
-    path: '/sign-up',
-    element: page.signup
-  },
-  {
-    path: '/',
-    element: <RequireAuth/>,
+    element: <RequireNoAuth />,
     children: [
       {
-        path: '/dashboard/pegawai',
-        element: page.DashboardKaryawan
+        path: "/login",
+        element: page.loginpage,
       },
       {
-        path: '/surat-masuk-pegawai-page',
-        element: page.SuratMasukPegawaiPage
-      }
-    ]
+        path: "/sign-up",
+        element: page.signup,
+      },
+    ],
   },
-  {
-    path: '/',
-    element: <RequireRole allowedRoles={['1']} redirectPath="/" />,
-    children: [
-      {
-        path: '/dashboard',
-        element: page.homepage
-      },
-      {
-        path: '/profile/:id',
-        element: page.ProfilePage
-      },
-      {
-        path: '/profile/change-password/:id',
-        element: page.ChangePasswordPage
-      },
-      {
-        path: '/profile/change-name/:id',
-        element: page.ChangeNamePage
-      },
-      {
-        path: '/surat-masuk-page',
-        element: page.SuratMasukPage
-      },
-      {
-        path: '/surat-masuk-pegawai-page',
-        element: page.SuratMasukPegawaiPage
-      },
-      {
-        path: '/surat-masuk-page/add-surat',
-        element: page.FormAddSuratMasuk
-      },
-      {
-        path: '/surat-masuk-page/edit-surat/:idSuratMasuk',
-        element: page.FormEditSuratMasuk
-      },
-      {
-        path: '/surat-keluar-page',
-        element: page.SuratKeluarPage
-      },
-      {
-        path: '/surat-keluar-page/add-surat',
-        element: page.FormAddSuratKeluar
-      },
-      {
-        path: '/surat-keluar-page/edit-surat/:idSuratKeluar',
-        element: page.FormEditSuratKeluar
-      },
-      {
-        path: '/jenis-surat-page',
-        element: page.JenisSuratPage
-      },
-      {
-        path: '/jabatan-page',
-        element: page.JabatanPage
-      },
-      {
-        path: '/pegawai-page',
-        element: page.PegawaiPage
-      },
-      {
-        path: '/pegawai-page/add-pegawai',
-        element: page.FormAddPegawaiPage
-      },
-      {
-        path: '/pegawai-page/update-pegawai/:IDPEGAWAI',
-        element: page.FormEditPegawaiPage
-      },
-    ]
-  }
-])
 
-export default router
+  /* ================= AUTHENTICATED ================= */
+  {
+    element: <RequireAuth />,
+    children: [
+      {
+        path: "/",
+        element: <Navigate to="/dashboard" replace />,
+      },
+      {
+        path: "/dashboard/pegawai",
+        element: page.DashboardKaryawan,
+      },
+      {
+        path: "/surat-masuk-pegawai-page",
+        element: page.SuratMasukPegawaiPage,
+      },
+
+      /* ===== ADMIN ONLY ===== */
+      {
+        element: <RequireRole allowedRoles={["1"]} />,
+        children: [
+          {
+            path: "/dashboard",
+            element: page.homepage,
+          },
+          {
+            path: "/profile/:id",
+            element: page.ProfilePage,
+          },
+          {
+            path: "/profile/change-password/:id",
+            element: page.ChangePasswordPage,
+          },
+          {
+            path: "/profile/change-name/:id",
+            element: page.ChangeNamePage,
+          },
+          {
+            path: "/surat-masuk-page",
+            element: page.SuratMasukPage,
+          },
+          {
+            path: "/surat-masuk-page/add-surat",
+            element: page.FormAddSuratMasuk,
+          },
+          {
+            path: "/surat-masuk-page/edit-surat/:idSuratMasuk",
+            element: page.FormEditSuratMasuk,
+          },
+          {
+            path: "/surat-keluar-page",
+            element: page.SuratKeluarPage,
+          },
+          {
+            path: "/surat-keluar-page/add-surat",
+            element: page.FormAddSuratKeluar,
+          },
+          {
+            path: "/surat-keluar-page/edit-surat/:idSuratKeluar",
+            element: page.FormEditSuratKeluar,
+          },
+          {
+            path: "/jenis-surat-page",
+            element: page.JenisSuratPage,
+          },
+          {
+            path: "/jabatan-page",
+            element: page.JabatanPage,
+          },
+          {
+            path: "/pegawai-page",
+            element: page.PegawaiPage,
+          },
+          {
+            path: "/pegawai-page/add-pegawai",
+            element: page.FormAddPegawaiPage,
+          },
+          {
+            path: "/pegawai-page/update-pegawai/:IDPEGAWAI",
+            element: page.FormEditPegawaiPage,
+          },
+        ],
+      },
+    ],
+  },
+]);
+
+export default router;

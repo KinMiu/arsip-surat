@@ -1,37 +1,44 @@
-import { jwtDecode } from 'jwt-decode'
-import { Navigate, Outlet } from 'react-router-dom'
+import {jwtDecode} from "jwt-decode";
+import {Navigate, Outlet} from "react-router-dom";
 
-const RequireAuth = ( ) => {
-  const isAuthenticate = localStorage.getItem('access-token')
-
-  if(!isAuthenticate){
-    return <Navigate to='/login' />
-  }
-
-  return <Outlet/>
-}
-
-const RequireRole = ( {allowedRoles, redirectPath} ) => {
-  const token = localStorage.getItem('access-token')
-  console.log(token)
+const RequireAuth = () => {
+  const token = localStorage.getItem("access-token");
 
   if (!token) {
-    return <Navigate to={redirectPath} />
+    return <Navigate to="/login" replace />;
   }
+
+  return <Outlet />;
+};
+
+const RequireRole = ({allowedRoles, redirectPath = "/dashboard"}) => {
+  const token = localStorage.getItem("access-token");
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
   try {
+    const {ROLE} = jwtDecode(token);
 
-    const { ROLE } = jwtDecode(token)
-
-    if (!allowedRoles.includes(ROLE)) {
-      return <Navigate to={redirectPath} />
+    if (!allowedRoles.includes(String(ROLE))) {
+      return <Navigate to={redirectPath} replace />;
     }
-
-  } catch (error) {
-    console.error('Invalid token:', error)
-    return <Navigate to={redirectPath} />
+  } catch (err) {
+    return <Navigate to="/login" replace />;
   }
 
-  return <Outlet/>
-}
+  return <Outlet />;
+};
 
-export {RequireAuth, RequireRole}
+const RequireNoAuth = () => {
+  const token = localStorage.getItem("access-token");
+
+  if (token) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <Outlet />;
+};
+
+export {RequireAuth, RequireRole, RequireNoAuth};
