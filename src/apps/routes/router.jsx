@@ -25,7 +25,7 @@ const router = createBrowserRouter([
     element: <RequireAuth />,
     children: [
       {
-        path: "/",
+        index: true,
         element: <Navigate to="/dashboard" replace />,
       },
       {
