@@ -2,45 +2,49 @@ import axios from "axios";
 
 // Membuat instance axios
 export const api = axios.create({
-  baseURL: "http://localhost:5018/",
-  // baseURL: "https://api-arsip-surat.psti-ubl.id/",
-  withCredentials: true // Memastikan cookies dikirim dalam setiap request
+  baseURL: "https://api-arsip-surat.psti-ubl.id/",
+  // baseURL: "http://localhost:5042/",
+  withCredentials: true, // Memastikan cookies dikirim dalam setiap request
 });
 
 // Tambahkan interceptors untuk request
 api.interceptors.request.use(
-  config => {
-    const token = localStorage.getItem('access-token');
+  (config) => {
+    const token = localStorage.getItem("access-token");
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
-  error => {
+  (error) => {
     return Promise.reject(error);
   }
 );
 
 // Tambahkan interceptors untuk response
 api.interceptors.response.use(
-  response => {
+  (response) => {
     return response;
   },
-  async error => {
+  async (error) => {
     const originalRequest = error.config;
     if (error.response.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const response = await api.post('/user/refreshtoken', {}, {
-          withCredentials: true // Memastikan cookies dikirim dalam request
-        });
+        const response = await api.post(
+          "/user/refreshtoken",
+          {},
+          {
+            withCredentials: true, // Memastikan cookies dikirim dalam request
+          }
+        );
         // console.log(response)
         const newToken = response.data.accessToken;
-        localStorage.setItem('access-token', newToken);
-        originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+        localStorage.setItem("access-token", newToken);
+        originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        console.error('Refresh token failed', refreshError);
+        console.error("Refresh token failed", refreshError);
         // Redirect to login or handle error as needed
       }
     }
@@ -49,5 +53,5 @@ api.interceptors.response.use(
 );
 
 export const region = axios.create({
-  baseURL: "http://localhost:3002/"
+  baseURL: "http://localhost:3002/",
 });
